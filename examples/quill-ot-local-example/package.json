@@ -1,0 +1,32 @@
+{
+  "name": "@pirosikick/quill-ot-local-example",
+  "version": "1.0.0",
+  "description": "> TODO: description",
+  "author": "Hiroyuki ANAI <pirosikick@gmail.com>",
+  "homepage": "https://github.com/pirosikick/quill-ot-example/tree/master/examples/quill-ot-local-example#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/pirosikick/quill-ot-example.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/pirosikick/quill-ot-example/issues"
+  },
+  "dependencies": {
+    "@pirosikick/quill-ot-core": "^1.0.0"
+  }
+}

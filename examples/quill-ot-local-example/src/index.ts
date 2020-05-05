@@ -1,6 +1,11 @@
 import Quill from "quill";
 import Delta from "quill-delta";
-import { Client, Server, ClientAdapter, ServerAdapter } from "../..";
+import {
+  Client,
+  Server,
+  ClientAdapter,
+  ServerAdapter
+} from "@pirosikick/quill-ot-core";
 
 const editorA = new Quill(document.getElementById("editor-a") as Element, {
   theme: "snow"
