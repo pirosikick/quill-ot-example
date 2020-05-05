@@ -17,6 +17,9 @@ module.exports = examples.map((example) => ({
       {
         test: /\.tsx?$/,
         use: "ts-loader",
+        options: {
+          transpileOnly: true
+        },
         exclude: /node_modules/
       }
     ]
