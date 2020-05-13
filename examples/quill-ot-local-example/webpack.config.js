@@ -5,7 +5,7 @@ const HTMLPlugin = require("html-webpack-plugin");
  * @type {import('webpack').Configuration}
  */
 module.exports = {
-  entry: path.join(__dirname, "src/index.ts"),
+  entry: path.resolve(__dirname, "./src/index.ts"),
   output: {
     publicPath: "/examples/local/"
   },
@@ -28,7 +28,7 @@ module.exports = {
   },
   plugins: [
     new HTMLPlugin({
-      template: path.join(__dirname, "src/index.ejs")
+      template: path.resolve(__dirname, "./src/index.ejs")
     })
   ]
 };
