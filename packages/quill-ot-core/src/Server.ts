@@ -1,5 +1,7 @@
 import Delta from "quill-delta";
 import type { ServerAdapter } from "./interfaces";
+import { RangeStatic } from "quill";
+import transformRange from "./transformRange";
 
 class Server {
   document: Delta;
@@ -13,6 +15,7 @@ class Server {
 
     this.adapter.onConnect(this.handleConnect);
     this.adapter.onReceiveClientOperation(this.handleReceiveClientOperation);
+    this.adapter.onReceiveClientSelection(this.handleReceiveClientSelection);
   }
 
   handleConnect = (clientId: string) => {
@@ -34,6 +37,21 @@ class Server {
     this.operations.push(operation);
     this.adapter.sendAck(clientId);
     this.adapter.broadcastOperation(clientId, operation);
+  };
+
+  handleReceiveClientSelection = (
+    clientId: string,
+    selection: RangeStatic | null,
+    revision: number
+  ) => {
+    if (selection) {
+      const concurrentOperations = this.operations.slice(revision - 1);
+      selection = concurrentOperations.reduce(
+        (selection, op) => transformRange(op, selection, true),
+        selection
+      );
+    }
+    this.adapter.broadcastSelection(clientId, selection);
   };
 
   currentRevision() {

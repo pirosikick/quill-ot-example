@@ -21,6 +21,7 @@
   "devDependencies": {
     "@types/quill": "^2.0.3",
     "@types/uuid": "^7.0.3",
+    "del-cli": "^3.0.1",
     "html-webpack-plugin": "^4.3.0",
     "lerna": "^3.20.2",
     "ts-loader": "^7.0.2",

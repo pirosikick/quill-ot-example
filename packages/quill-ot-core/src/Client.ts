@@ -1,31 +1,40 @@
 import { v4 as uuid } from "uuid";
 import Delta from "quill-delta";
+import transformRange from "./transformRange";
 
-import type { Quill, Sources } from "quill";
-import type { ClientAdapter } from "./interfaces";
+import type { Quill, RangeStatic, Sources } from "quill";
+import type { ClientAdapter, SelectionRenderer } from "./interfaces";
 
 class Client {
   id: string;
   editor: Quill;
   adapter: ClientAdapter;
+  selectionRenderer: SelectionRenderer;
   document: Delta;
   revision: number;
   outstanding: Delta | undefined = undefined;
   buffer: Delta | undefined = undefined;
 
-  constructor(editor: Quill, adapter: ClientAdapter) {
+  constructor(
+    editor: Quill,
+    adapter: ClientAdapter,
+    selectionRenderer: SelectionRenderer
+  ) {
     this.id = uuid();
     this.editor = editor;
     this.adapter = adapter;
+    this.selectionRenderer = selectionRenderer;
     this.document = new Delta();
     this.revision = 0;
 
     this.editor.disable();
     this.editor.on("text-change", this.handleEditorTextChange);
+    this.editor.on("selection-change", this.handleEditorSelectionChange);
 
     this.adapter.onReceiveDocument(this.handleReceiveDocumennt);
     this.adapter.onReceiveAck(this.handleReceiveAck);
     this.adapter.onReceiveServerOperation(this.handleReceiveOperation);
+    this.adapter.onReceiveServerSelection(this.handleReceiveSelection);
 
     this.adapter.connect(this.id);
   }
@@ -44,6 +53,10 @@ class Client {
         this.buffer = this.buffer.compose(operation);
       }
     }
+  };
+
+  handleEditorSelectionChange = (selection: RangeStatic) => {
+    this.adapter.sendSelection(this.id, selection, this.revision);
   };
 
   handleReceiveDocumennt = (document: Delta, revision: number) => {
@@ -71,6 +84,16 @@ class Client {
     this.applyServerOperation(operation);
   };
 
+  handleReceiveSelection = (
+    clientId: string,
+    selection: RangeStatic | null
+  ) => {
+    if (selection) {
+      selection = this.transformSelection(selection);
+    }
+    this.selectionRenderer.renderSelection(clientId, selection);
+  };
+
   private sendOperation(operation: Delta) {
     this.adapter.sendOperation(this.id, operation, this.revision + 1);
     this.outstanding = operation;
@@ -91,6 +114,16 @@ class Client {
 
     this.revision++;
     this.editor.updateContents(operation);
+  }
+
+  private transformSelection(selection: RangeStatic) {
+    if (this.outstanding) {
+      selection = transformRange(this.outstanding, selection);
+      if (this.buffer) {
+        selection = transformRange(this.buffer, selection);
+      }
+    }
+    return selection;
   }
 }
 

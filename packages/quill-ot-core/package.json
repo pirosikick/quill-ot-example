@@ -21,7 +21,8 @@
     "url": "git+ssh://git@github.com/pirosikick/quill-ot-example.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "clean": "del lib",
+    "build": "tsc -b ."
   },
   "bugs": {
     "url": "https://github.com/pirosikick/quill-ot-example/issues"

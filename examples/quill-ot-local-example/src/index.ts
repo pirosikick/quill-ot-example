@@ -1,10 +1,11 @@
-import Quill from "quill";
+import Quill, { RangeStatic } from "quill";
 import Delta from "quill-delta";
 import {
   Client,
   Server,
   ClientAdapter,
-  ServerAdapter
+  ServerAdapter,
+  SimpleSelectionRenderer
 } from "@pirosikick/quill-ot-core";
 
 const editorA = new Quill(document.getElementById("editor-a") as Element, {
@@ -20,6 +21,10 @@ class LocalClientAdapter implements ClientAdapter {
   handleReceiveDocument: (document: Delta, revision: number) => void = NOOP;
   handleReceiveAck: () => void = NOOP;
   handleReceiveServerOperation: (operation: Delta) => void = NOOP;
+  handleReceiveServerSelection: (
+    clientId: string,
+    selection: RangeStatic
+  ) => void = NOOP;
   serverAdapter: LocalServerAdapter;
 
   constructor(serverAdapter: LocalServerAdapter) {
@@ -42,11 +47,23 @@ class LocalClientAdapter implements ClientAdapter {
       revision
     );
   }
+  sendSelection(clientId: string, selection: RangeStatic, revision: number) {
+    this.serverAdapter.handleReceiveClientSelection(
+      clientId,
+      selection,
+      revision
+    );
+  }
   onReceiveAck(handler: () => void) {
     this.handleReceiveAck = handler;
   }
   onReceiveServerOperation(handler: (operation: Delta) => void) {
     this.handleReceiveServerOperation = handler;
+  }
+  onReceiveServerSelection(
+    handler: (clientId: string, selection: RangeStatic) => void
+  ) {
+    this.handleReceiveServerSelection = handler;
   }
 }
 
@@ -55,6 +72,11 @@ class LocalServerAdapter implements ServerAdapter {
   handleReceiveClientOperation: (
     clientId: string,
     operation: Delta,
+    revision: number
+  ) => void = NOOP;
+  handleReceiveClientSelection: (
+    clientId: string,
+    selection: RangeStatic,
     revision: number
   ) => void = NOOP;
 
@@ -86,6 +108,13 @@ class LocalServerAdapter implements ServerAdapter {
         adapter.handleReceiveServerOperation(operation);
       });
   }
+  broadcastSelection(excludedClientId: string, selection: RangeStatic) {
+    Object.entries(this.clientAdapters)
+      .filter(([clientId]) => clientId !== excludedClientId)
+      .forEach(([clientId, adapter]) => {
+        adapter.handleReceiveServerSelection(excludedClientId, selection);
+      });
+  }
   sendDocument(clientId: string, document: Delta, revision: number) {
     this.clientAdapters[clientId]?.handleReceiveDocument(document, revision);
   }
@@ -94,13 +123,24 @@ class LocalServerAdapter implements ServerAdapter {
   ) {
     this.handleReceiveClientOperation = handler;
   }
+  onReceiveClientSelection(
+    handler: (
+      clientId: string,
+      selection: RangeStatic,
+      revision: number
+    ) => void
+  ) {
+    this.handleReceiveClientSelection = handler;
+  }
 }
 
 const serverAdapter = new LocalServerAdapter();
 const server = new Server(new Delta(), serverAdapter);
 
 const clientAdapterA = new LocalClientAdapter(serverAdapter);
-const clientA = new Client(editorA, clientAdapterA);
+const selectionRendererA = new SimpleSelectionRenderer(editorA);
+const clientA = new Client(editorA, clientAdapterA, selectionRendererA);
 
 const clientAdapterB = new LocalClientAdapter(serverAdapter);
-const clientB = new Client(editorB, clientAdapterB);
+const selectionRendererB = new SimpleSelectionRenderer(editorB);
+const clientB = new Client(editorB, clientAdapterB, selectionRendererB);
