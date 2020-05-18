@@ -20,6 +20,7 @@ export default class SimpleSelectionRenderer implements SelectionRenderer {
     if (selection) {
       const bounds = this.editor.getBounds(selection.index, selection.length);
       const root = this.editor.root.getBoundingClientRect();
+      this.selections[clientId].style.display = "block";
       this.selections[clientId].style.top = `${root.top + bounds.top}px`;
       this.selections[clientId].style.left = `${root.left + bounds.left}px`;
       this.selections[clientId].style.width = bounds.width
@@ -27,7 +28,7 @@ export default class SimpleSelectionRenderer implements SelectionRenderer {
         : "1px";
       this.selections[clientId].style.height = `${bounds.height}px`;
     } else {
-      this.removeSelectionElement(clientId);
+      this.hideSelectionElement(clientId);
     }
   }
 
@@ -45,10 +46,9 @@ export default class SimpleSelectionRenderer implements SelectionRenderer {
     return div;
   }
 
-  private removeSelectionElement(clientId: string) {
+  private hideSelectionElement(clientId: string) {
     if (this.selections[clientId]) {
-      this.container.removeChild(this.selections[clientId]);
-      delete this.selections[clientId];
+      this.selections[clientId].style.display = "none";
     }
   }
 }
