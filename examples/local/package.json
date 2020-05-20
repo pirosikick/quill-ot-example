@@ -1,9 +1,9 @@
 {
-  "name": "@pirosikick/quill-ot-core",
+  "name": "@pirosikick/quill-ot-local-example",
   "version": "1.0.0",
   "description": "> TODO: description",
   "author": "Hiroyuki ANAI <pirosikick@gmail.com>",
-  "homepage": "https://github.com/pirosikick/quill-ot-example/tree/master/packages/quill-ot-core#readme",
+  "homepage": "https://github.com/pirosikick/quill-ot-example/tree/master/examples/quill-ot-local-example#readme",
   "license": "MIT",
   "main": "lib/index.js",
   "directories": {
@@ -21,18 +21,16 @@
     "url": "git+ssh://git@github.com/pirosikick/quill-ot-example.git"
   },
   "scripts": {
-    "clean": "del lib",
-    "build": "tsc -b ."
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "tsc -b .",
+    "dev": "run-p dev:*",
+    "dev:webpack": "webpack-dev-server",
+    "dev:tsc": "tsc --watch -b ."
   },
   "bugs": {
     "url": "https://github.com/pirosikick/quill-ot-example/issues"
   },
   "dependencies": {
-    "quill-delta": "^4.2.2",
-    "uuid": "^8.0.0"
-  },
-  "devDependencies": {
-    "@types/quill": "^2.0.3",
-    "@types/uuid": "^7.0.3"
+    "@pirosikick/quill-ot": "../.."
   }
 }

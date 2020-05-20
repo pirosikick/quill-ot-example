@@ -6,7 +6,7 @@ import {
   ClientAdapter,
   ServerAdapter,
   SimpleSelectionRenderer
-} from "@pirosikick/quill-ot-core";
+} from "@pirosikick/quill-ot";
 
 const editorA = new Quill(document.getElementById("editor-a") as Element, {
   theme: "snow"
@@ -104,14 +104,14 @@ class LocalServerAdapter implements ServerAdapter {
   broadcastOperation(excludedClientId: string, operation: Delta) {
     Object.entries(this.clientAdapters)
       .filter(([clientId]) => clientId !== excludedClientId)
-      .forEach(([clientId, adapter]) => {
+      .forEach(([_, adapter]) => {
         adapter.handleReceiveServerOperation(operation);
       });
   }
   broadcastSelection(excludedClientId: string, selection: RangeStatic) {
     Object.entries(this.clientAdapters)
       .filter(([clientId]) => clientId !== excludedClientId)
-      .forEach(([clientId, adapter]) => {
+      .forEach(([_, adapter]) => {
         adapter.handleReceiveServerSelection(excludedClientId, selection);
       });
   }
@@ -135,12 +135,12 @@ class LocalServerAdapter implements ServerAdapter {
 }
 
 const serverAdapter = new LocalServerAdapter();
-const server = new Server(new Delta(), serverAdapter);
+new Server(new Delta(), serverAdapter);
 
 const clientAdapterA = new LocalClientAdapter(serverAdapter);
 const selectionRendererA = new SimpleSelectionRenderer(editorA);
-const clientA = new Client(editorA, clientAdapterA, selectionRendererA);
+new Client(editorA, clientAdapterA, selectionRendererA);
 
 const clientAdapterB = new LocalClientAdapter(serverAdapter);
 const selectionRendererB = new SimpleSelectionRenderer(editorB);
-const clientB = new Client(editorB, clientAdapterB, selectionRendererB);
+new Client(editorB, clientAdapterB, selectionRendererB);

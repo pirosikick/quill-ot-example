@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "outDir": "./lib"
-  },
-  "extends": "../../tsconfig.json",
-  "references": [{ "path": "../../packages/quill-ot-core" }]
-}

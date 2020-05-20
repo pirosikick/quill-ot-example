@@ -39,11 +39,7 @@ class Client {
     this.adapter.connect(this.id);
   }
 
-  handleEditorTextChange = (
-    operation: Delta,
-    oldContents: Delta,
-    source: Sources
-  ) => {
+  handleEditorTextChange = (operation: Delta, _: Delta, source: Sources) => {
     if (source === "user") {
       if (!this.outstanding) {
         this.sendOperation(operation);
